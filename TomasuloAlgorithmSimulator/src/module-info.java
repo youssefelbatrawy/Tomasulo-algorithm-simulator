@@ -6,6 +6,7 @@
  */
 module TomasuloAlgorithmSimulator {
 	// 7oto ay library test3melooha hena
+	requires transitive javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
 
