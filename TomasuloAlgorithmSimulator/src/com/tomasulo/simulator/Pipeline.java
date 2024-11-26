@@ -3,6 +3,19 @@ package com.tomasulo.simulator;
 import java.util.Queue;
 import java.util.LinkedList;
 
+/*
+ * Print the Queue
+ * 		System.out.println("Queue: " + queue);
+*/
+/*
+ * Remove an element (FIFO order)
+ * 		Instruction instruction = queue.poll();
+*/
+/*
+ * Peek at the front of the queue without removing
+ * 		Person frontPerson = queue.peek();
+*/
+
 public class Pipeline {
 	
 	Queue<Instruction> instructions;
