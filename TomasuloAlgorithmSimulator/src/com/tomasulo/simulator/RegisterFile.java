@@ -31,17 +31,18 @@ public class RegisterFile {
         registerFile.put(target, newValue);
     }
 	
-	public static void main(String[] args) {
-		String[] a = {"f0", "f1", "f2", "f3"};
-		String[] b = {"1", "2", "LD", "M1"};
-		
-		RegisterFile d = new RegisterFile(a, b);
-		
-		System.out.println(d.getRegisterFile());
-		System.out.println(d.getFpValue("f0"));
-		d.setFpValue("f0", "2");
-		System.out.println(d.getFpValue("f0"));
-		d.setFpValue("f10", "2");
-		
-	}
+    // Kont ba test hena
+//	public static void main(String[] args) {
+//		String[] a = {"f0", "f1", "f2", "f3"};
+//		String[] b = {"1", "2", "LD", "M1"};
+//		
+//		RegisterFile d = new RegisterFile(a, b);
+//		
+//		System.out.println(d.getRegisterFile());
+//		System.out.println(d.getFpValue("f0"));
+//		d.setFpValue("f0", "2");
+//		System.out.println(d.getFpValue("f0"));
+//		d.setFpValue("f10", "2");
+//		
+//	}
 }
