@@ -5,4 +5,4 @@
 !module-info.class
 
 # Exclude package-info.class from being ignored
-!package-info.class
+!**/package-info.class
