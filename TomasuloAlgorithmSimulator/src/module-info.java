@@ -14,4 +14,5 @@ module TomasuloAlgorithmSimulator {
     opens com.tomasulo.gui to javafx.fxml;
     exports com.tomasulo.gui;
     exports com.tomasulo.main;
+    exports com.tomasulo.simulator;
 }
