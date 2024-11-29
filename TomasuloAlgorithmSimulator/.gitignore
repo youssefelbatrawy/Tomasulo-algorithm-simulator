@@ -1,1 +1,5 @@
-**/*.class
+# Ignore all .class files
+*.class
+
+# Exclude module-info.class from being ignored
+!module-info.class
