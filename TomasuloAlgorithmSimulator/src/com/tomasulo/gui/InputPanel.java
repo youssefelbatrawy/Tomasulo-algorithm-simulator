@@ -123,4 +123,34 @@ public class InputPanel extends VBox {
         System.out.println("Multiply Buffers: " + multiplyBufferField.getText());
         System.out.println("Divide Buffers: " + divideBufferField.getText());
     }
+    
+	public static String[] getRegisterFileQ_isArray() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public static String[] getRegisterFileValuesArray() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static int getLoadBufferSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public static int getStoreBufferSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public static int getAddersReservationStationSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public static int getMultipliersReservationStationSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

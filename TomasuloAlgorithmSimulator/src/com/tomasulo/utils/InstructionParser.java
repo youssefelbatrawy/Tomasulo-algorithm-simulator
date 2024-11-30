@@ -6,6 +6,8 @@ import com.tomasulo.simulator.Instruction;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 public class InstructionParser {
 
@@ -97,6 +99,42 @@ public class InstructionParser {
             }
         }
     }
+    
+    public static String[] extractDestinations(String filePath) throws IOException {
+        TreeSet<String> fRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
+        TreeSet<String> rRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
+
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
+            if (line.isEmpty() || line.toLowerCase().startsWith("loop")) {
+                continue;
+            }
+
+            String[] parts = line.split("\\s+");
+            if (parts.length < 2) {
+                continue;
+            }
+
+            String destination = parts[1];
+            if (destination.matches("^F\\d+$")) {
+                fRegisters.add(destination.toUpperCase());
+            } else if (destination.matches("^R\\d+$")) {
+                rRegisters.add(destination.toUpperCase());
+            }
+        }
+
+        reader.close();
+
+        // Combine the sorted sets into one array
+        ArrayList<String> combined = new ArrayList<>(fRegisters);
+        combined.addAll(rRegisters);
+
+        return combined.toArray(new String[0]);
+    }
 
     // Testing bas
 //    public static void main(String[] args) {
@@ -116,4 +154,25 @@ public class InstructionParser {
 //            e.printStackTrace();
 //        }
 //    }
+    
+    public static void main(String[] args) {
+        try {
+            String filePath = "C:\\Users\\Youse\\Desktop\\File.txt";
+
+            // Parse instructions
+            ArrayList<Object> instructions = parseInstructions(filePath);
+
+            // Extract destinations
+            String[] destinations = extractDestinations(filePath);
+
+            // Output destinations for verification
+            System.out.println("Destinations in order:");
+            for (String dest : destinations) {
+                System.out.println(dest);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

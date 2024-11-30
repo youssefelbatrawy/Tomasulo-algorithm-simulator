@@ -35,14 +35,35 @@ public class Pipeline {
 		}
 		
 		this.registerFile = new RegisterFile(fps, qI, values);
+		
+		
 		this.loadBuffers = new LoadBuffer[loadBuffer];
+		for(int i = 0; i < this.loadBuffers.length; i++) {
+			this.loadBuffers[i] = new LoadBuffer("L" + (i+1));
+		}
+		
 		this.storeBuffers = new StoreBuffer[storeBuffer];
+		for(int i = 0; i < this.storeBuffers.length; i++) {
+			this.storeBuffers[i] = new StoreBuffer("S" + (i+1));
+		}
+		
 		this.adderReservationStations = new ReservationStation[adderReservationStations];
+		for(int i = 0; i < this.storeBuffers.length; i++) {
+			this.adderReservationStations[i] = new ReservationStation("A" + (i+1));
+		}
+		
 		this.multiplierReservationStations = new ReservationStation[multiplierReservationStations];
+		for(int i = 0; i < this.storeBuffers.length; i++) {
+			this.multiplierReservationStations[i] = new ReservationStation("M" + (i+1));
+		}
 	}
 	
-//	// Adds new instruction in the instruction queue
-//	public void addNewInstruction(Operations operation, String destination, String source1, String source2) {
-//		this.instructions.add(new Instruction(operation, destination, source1, source2));
-//	}
+	public Object deqeueInstruction() {
+		return this.instructions.poll();
+	}
+	
+	
+	
+	
+	
 }
