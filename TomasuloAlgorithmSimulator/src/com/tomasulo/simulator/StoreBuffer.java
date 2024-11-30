@@ -8,4 +8,5 @@ public class StoreBuffer extends Buffer {
 	public StoreBuffer(String name) {
 		super(name);
 	}
+	
 }

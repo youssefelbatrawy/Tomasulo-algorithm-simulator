@@ -1,18 +1,30 @@
 package com.tomasulo.simulator;
 
-import com.tomasulo.predefintions.Operand;
+import com.tomasulo.predefintions.Operations;
 import com.tomasulo.predefintions.Status;
 
 public class Instruction {
-	Operand operand;
-	String source;
+	Operations operation;
+	String source1;
+	String source2;
 	String destination;
 	Status status;
 	
-	public Instruction(Operand operand, String source, String destination) {
-		this.operand = operand;
-		this.source = source;
+	public Instruction(Operations operation, String destination, String source1, String source2) {
+		this.operation = operation;
 		this.destination = destination;
+		this.source1 = source1;
+		this.source2 = source2;
 		this.status = null;
+	}
+	
+	@Override
+	public String toString() {
+	    return "Instruction{" +
+	            "operation=" + operation +
+	            ", destination='" + destination + '\'' +
+	            ", source1='" + source1 + '\'' +
+	            ", source2='" + source2 + '\'' +
+	            '}';
 	}
 }

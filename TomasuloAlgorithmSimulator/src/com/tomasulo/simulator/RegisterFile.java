@@ -38,25 +38,4 @@ public class RegisterFile {
         registerFile.put(target, new String[]{updatedQI, updatedValue});
     }
 
-    public static void main(String[] args) {
-        String[] fps =    {"f0", "f1", "f2", "f3"};
-        String[] qI =     {null, null, null, null}; 
-        String[] values = {null, null, null, "9"};
-
-        RegisterFile registerFile = new RegisterFile(fps, qI, values);
-
-        System.out.println("Before Update:");
-        registerFile.getRegisterFile().forEach((key, value) ->
-                System.out.println(key + " -> Q_i: " + value[0] + ", Value: " + value[1]));
-
-        registerFile.setFpValue("f1", "M1", null);
-
-        registerFile.setFpValue("f2", null, "35.0");
-
-        registerFile.setFpValue("f3", "M2", "50.0");
-
-        System.out.println("\nAfter Update:");
-        registerFile.getRegisterFile().forEach((key, value) ->
-                System.out.println(key + " -> Q_i: " + value[0] + ", Value: " + value[1]));
-    }
 }
