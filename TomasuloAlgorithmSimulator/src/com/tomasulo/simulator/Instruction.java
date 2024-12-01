@@ -4,7 +4,7 @@ import com.tomasulo.predefintions.Operations;
 import com.tomasulo.predefintions.Status;
 
 public class Instruction {
-	Operations operation;
+	public Operations operation;
 	String source1;
 	String source2;
 	String destination;

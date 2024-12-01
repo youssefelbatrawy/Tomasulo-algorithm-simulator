@@ -22,12 +22,12 @@ import java.util.LinkedList;
 
 public class Pipeline {
 	
-	Queue<Object> instructions = new LinkedList<>();
-	RegisterFile registerFile;
-	LoadBuffer[] loadBuffers;
-	StoreBuffer[] storeBuffers;
-	ReservationStation[] adderReservationStations;
-	ReservationStation[] multiplierReservationStations;
+	public Queue<Object> instructions = new LinkedList<>();
+	public RegisterFile registerFile;
+	public LoadBuffer[] loadBuffers;
+	public StoreBuffer[] storeBuffers;
+	public ReservationStation[] adderReservationStations;
+	public ReservationStation[] multiplierReservationStations;
 	
 	public Pipeline(ArrayList<Object> instructions, String[] fps, String[] qI, String[] values, int loadBuffer, int storeBuffer, int adderReservationStations, int multiplierReservationStations) {
 		for(int i = 0; i < instructions.size(); i++) {
@@ -63,7 +63,83 @@ public class Pipeline {
 	}
 	
 	
+	// Checks if there is a free Load Buffer
+	public boolean isThereAFreeLoadBuffer() {
+		for(int i = 0; i < this.loadBuffers.length; i++) {
+			if(!this.loadBuffers[i].isBusy) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
+	// Checks if there is a free Store Buffer
+	public boolean isThereAFreeStoreBuffer() {
+		for(int i = 0; i < this.storeBuffers.length; i++) {
+			if(!this.storeBuffers[i].isBusy) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
+	// Checks if an Adder is free
+	public boolean isThereAFreeAdder() {
+		for(int i = 0; i < this.adderReservationStations.length; i++) {
+			if(!this.adderReservationStations[i].isBusy) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
+	// Checks if a Multiplier is free
+	public boolean isThereAFreeMultiplier() {
+		for(int i = 0; i < this.multiplierReservationStations.length; i++) {
+			if(!this.multiplierReservationStations[i].isBusy) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// Returns first free Load Buffer index
+	public int getFreeLoadBufferIndex() {
+		for(int i = 0; i < this.loadBuffers.length; i++) {
+			if(!this.loadBuffers[i].isBusy) {
+				return i;
+			}
+		}
+		return 00;
+	}
+	
+	// Returns first free Store Buffer index
+	public int getFreeStoreBufferIndex() {
+		for(int i = 0; i < this.storeBuffers.length; i++) {
+			if(!this.storeBuffers[i].isBusy) {
+				return i;
+			}
+		}
+		return 00;
+	}
+	
+	// Returns first free Adder index
+	public int getFreeAdderIndex() {
+		for(int i = 0; i < this.adderReservationStations.length; i++) {
+			if(!this.adderReservationStations[i].isBusy) {
+				return i;
+			}
+		}
+		return 00;
+	}
+	
+	// Returns first free multiplier index
+	public int getFreeMultiplierIndex() {
+		for(int i = 0; i < this.multiplierReservationStations.length; i++) {
+			if(!this.multiplierReservationStations[i].isBusy) {
+				return i;
+			}
+		}
+		return 00;
+	}
 }
