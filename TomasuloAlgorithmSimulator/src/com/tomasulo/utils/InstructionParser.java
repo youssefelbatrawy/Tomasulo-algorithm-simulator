@@ -5,65 +5,64 @@ import com.tomasulo.simulator.LoopInstruction;
 import com.tomasulo.simulator.Instruction;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class InstructionParser {
 
-	public static ArrayList<Object> parseInstructions(String filePath) throws IOException {
-	    ArrayList<Object> instructionList = new ArrayList<>();
-	    @SuppressWarnings("resource") BufferedReader reader = new BufferedReader(new FileReader(filePath));
-	    String line;
-	    boolean inLoop = false;
-	    ArrayList<Instruction> loopInstructions = new ArrayList<>();
+    public static ArrayList<Object> parseInstructions(String filePath) throws IOException {
+        ArrayList<Object> instructionList = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        String line;
+        boolean inLoop = false;
+        ArrayList<Instruction> loopInstructions = new ArrayList<>();
 
-	    while ((line = reader.readLine()) != null) {
-	        // Preserve the original line for detecting tab
-	        String originalLine = line;
+        while ((line = reader.readLine()) != null) {
+            String originalLine = line;
+            line = line.trim();
 
-	        // Trim spaces for general parsing
-	        line = line.trim();
+            if (line.isEmpty()) {
+                continue;
+            }
 
-	        // Skip empty lines
-	        if (line.isEmpty()) {
-	            continue;
-	        }
+            if (line.toLowerCase().startsWith("loop")) {
+                if (inLoop) {
+                    throw new IllegalArgumentException("Nested loops are not allowed!");
+                }
+                inLoop = true;
+                continue;
+            }
 
-	        // Check if the line is a loop start
-	        if (line.toLowerCase().startsWith("loop")) {
-	            if (inLoop) {
-	                throw new IllegalArgumentException("Nested loops are not allowed!");
-	            }
-	            inLoop = true;
-	            continue;
-	        }
+            if (inLoop && originalLine.startsWith("\t")) {
+                loopInstructions.add(parseInstruction(line));
+                continue;
+            }
 
-	        // Check for indented lines with tabs
-	        if (inLoop && originalLine.startsWith("\t")) {
-	            loopInstructions.add(parseInstruction(line));
-	            continue;
-	        }
+            if (inLoop && !originalLine.startsWith("\t")) {
+                inLoop = false;
+                instructionList.add(new LoopInstruction(loopInstructions));
+                loopInstructions = new ArrayList<>();
+            }
 
-	        // If indentation ends, we close the loop
-	        if (inLoop && !originalLine.startsWith("\t")) {
-	            inLoop = false;
-	            instructionList.add(new LoopInstruction(loopInstructions));
-	            loopInstructions = new ArrayList<>();
-	        }
+            instructionList.add(parseInstruction(line));
+        }
 
-	        // Parse normal instruction
-	        instructionList.add(parseInstruction(line));
-	    }
+        if (inLoop) {
+            instructionList.add(new LoopInstruction(loopInstructions));
+        }
 
-	    // If loop ended unexpectedly
-	    if (inLoop) {
-	        instructionList.add(new LoopInstruction(loopInstructions));
-	    }
-
-	    reader.close();
-	    return instructionList;
-	}
+        reader.close();
+        return instructionList;
+    }
 
     private static Instruction parseInstruction(String line) {
         String[] parts = line.split("\\s+");
@@ -129,50 +128,79 @@ public class InstructionParser {
 
         reader.close();
 
-        // Combine the sorted sets into one array
         ArrayList<String> combined = new ArrayList<>(fRegisters);
         combined.addAll(rRegisters);
 
         return combined.toArray(new String[0]);
     }
-
-    // Testing bas
-//    public static void main(String[] args) {
-//        try {
-//        	String filePath = "C:\\Users\\Youse\\Desktop\\File.txt";
-//            ArrayList<Object> instructions = parseInstructions(filePath);
-//            
-//            // Output the parsed instructions for verification
-//            for (Object obj : instructions) {
-//                if (obj instanceof LoopInstruction) {
-//                    System.out.println("LoopInstruction: " + ((LoopInstruction) obj).instructions);
-//                } else if (obj instanceof Instruction) {
-//                    System.out.println("Instruction: " + obj);
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
     
-    public static void main(String[] args) {
-        try {
-            String filePath = "C:\\Users\\Youse\\Desktop\\File.txt";
+    public static String[] extractNonDestinations(String filePath, String[] destinations) throws IOException {
+        TreeSet<String> fRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
+        TreeSet<String> rRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
+        TreeSet<String> yRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(2, reg.length() - 1))));
 
-            // Parse instructions
-            ArrayList<Object> instructions = parseInstructions(filePath);
+        Set<String> destinationSet = new HashSet<>(Arrays.asList(destinations));
 
-            // Extract destinations
-            String[] destinations = extractDestinations(filePath);
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        String line;
 
-            // Output destinations for verification
-            System.out.println("Destinations in order:");
-            for (String dest : destinations) {
-                System.out.println(dest);
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
+            if (line.isEmpty() || line.toLowerCase().startsWith("loop")) {
+                continue;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            String[] parts = line.split("\\s+");
+            if (parts.length < 3) {
+                continue;
+            }
+
+            String source1 = parts[2];
+            String source2 = parts.length > 3 ? parts[3] : null;
+
+            if (source1 != null && !destinationSet.contains(source1.toUpperCase())) {
+                if (source1.matches("^F\\d+$")) {
+                    fRegisters.add(source1.toUpperCase());
+                } else if (source1.matches("^R\\d+$")) {
+                    rRegisters.add(source1.toUpperCase());
+                } else if (source1.matches("^Y\\(R\\d+\\)$")) {
+                    yRegisters.add(source1.toUpperCase());
+                }
+            }
+
+            if (source2 != null && !destinationSet.contains(source2.toUpperCase())) {
+                if (source2.matches("^F\\d+$")) {
+                    fRegisters.add(source2.toUpperCase());
+                } else if (source2.matches("^R\\d+$")) {
+                    rRegisters.add(source2.toUpperCase());
+                } else if (source2.matches("^Y\\(R\\d+\\)$")) {
+                    yRegisters.add(source2.toUpperCase());
+                }
+            }
         }
+
+        reader.close();
+
+        ArrayList<String> combined = new ArrayList<>(fRegisters);
+        combined.addAll(rRegisters);
+        combined.addAll(yRegisters);
+
+        return combined.toArray(new String[0]);
+    }
+    
+    public static Map<Operations, Integer> extractOperations(String filePath) throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get(filePath));
+        Map<Operations, Integer> operations = new HashMap<>();
+        for (Operations op : Operations.values()) {
+            operations.put(op, 1);
+        }
+        for (String line : lines) {
+            String[] parts = line.split(" ");
+            Operations operation = Operations.valueOf(parts[0].replace(".", "_").toUpperCase());
+            int latency = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
+            operations.put(operation, latency);
+        }
+        return operations;
     }
 }

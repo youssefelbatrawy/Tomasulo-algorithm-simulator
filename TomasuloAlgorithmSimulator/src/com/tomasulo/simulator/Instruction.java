@@ -4,11 +4,12 @@ import com.tomasulo.predefintions.Operations;
 import com.tomasulo.predefintions.Status;
 
 public class Instruction {
-	public Operations operation;
-	String source1;
-	String source2;
-	String destination;
-	Status status;
+	private Operations operation;
+	private String source1;
+	private String source2;
+	private String destination;
+	private Status status;
+	private int latency;
 	
 	public Instruction(Operations operation, String destination, String source1, String source2) {
 		this.operation = operation;
@@ -18,6 +19,54 @@ public class Instruction {
 		this.status = null;
 	}
 	
+	public Operations getOperation() {
+		return operation;
+	}
+
+	public void setOperation(Operations operation) {
+		this.operation = operation;
+	}
+
+	public String getSource1() {
+		return source1;
+	}
+
+	public void setSource1(String source1) {
+		this.source1 = source1;
+	}
+
+	public String getSource2() {
+		return source2;
+	}
+
+	public void setSource2(String source2) {
+		this.source2 = source2;
+	}
+
+	public String getDestination() {
+		return destination;
+	}
+
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	public int getLatency() {
+		return latency;
+	}
+
+	public void setLatency(int latency) {
+		this.latency = latency;
+	}
+
 	@Override
 	public String toString() {
 	    return "Instruction{" +

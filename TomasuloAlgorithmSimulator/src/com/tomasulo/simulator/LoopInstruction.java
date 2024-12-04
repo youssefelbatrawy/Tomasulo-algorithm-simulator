@@ -15,11 +15,20 @@ public class LoopInstruction {
 		}
 	}
 	
+	public Queue<Instruction> getInstructions() {
+        return instructions;
+	}
+	
+	public Instruction deqeueInstruction() {
+		return this.instructions.poll();
+	}
+	
+	public Instruction peekInstruction() {
+		return this.instructions.peek();
+	}
+	
 	@Override
 	public String toString() {
-	    return "LoopInstruction{" +
-	            "instructions=" + instructions +
-	            '}';
+	    return "LoopInstruction{" + "instructions=" + instructions + '}';
 	}
-
 }
