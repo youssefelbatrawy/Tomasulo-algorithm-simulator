@@ -1,3 +1,4 @@
+
 package com.tomasulo.gui;
 
 import javafx.scene.control.*;
@@ -32,41 +33,36 @@ public class LatencyScreen5 extends VBox {
         );
     }
 
-    public void initialize(String filePath) {
 
-    	AtomicReference<Map<Operations, Integer>> operationLatenciesRef = new AtomicReference<>(new HashMap<>());
-    	try {
-    	    operationLatenciesRef.set(InstructionParser.extractOperations(filePath));
-    	} catch (Exception e) {
-    	    e.printStackTrace();
-    	    operationInputs.getChildren().add(new Label("Failed to load operations. Please check the file path."));
-    	}
-
-    	Map<Operations, Integer> operationLatencies = operationLatenciesRef.get();
-
-    	operationInputs.getChildren().clear();
-    	for (Map.Entry<Operations, Integer> entry : operationLatencies.entrySet()) {
-    	    HBox row = new HBox(10);
-
-    	    TextField latencyField = new TextField(String.valueOf(entry.getValue()));
-    	    latencyField.textProperty().addListener((_, oldValue, newValue) -> {
-    	        if (newValue.trim().isEmpty()) {
-    	            operationLatencies.put(entry.getKey(), 1);
-    	        } else {
-    	            try {
-    	                int latency = Integer.parseInt(newValue.trim());
-    	                operationLatencies.put(entry.getKey(), latency);
-    	            } catch (NumberFormatException ex) {
-    	                latencyField.setText(oldValue);
-    	            }
-    	        }
-    	    });
-    	    row.getChildren().addAll(new Label(entry.getKey().toString()), latencyField);
-    	    operationInputs.getChildren().add(row);
-    	}
-    	nextButton.setOnAction(_ -> handleNext(operationLatenciesRef.get()));
-    }
-
+	public void initialize(String filePath) {
+	    AtomicReference<Map<Operations, Integer>> operationLatenciesRef = new AtomicReference<>(new HashMap<>());
+	    try {
+	        operationLatenciesRef.set(InstructionParser.extractOperations(filePath));
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        operationInputs.getChildren().add(new Label("Failed to load operations. Please check the file path."));
+	    }
+	
+	    Map<Operations, Integer> operationLatencies = operationLatenciesRef.get();
+	
+	    operationInputs.getChildren().clear();
+	    for (Map.Entry<Operations, Integer> entry : operationLatencies.entrySet()) {
+	        HBox row = new HBox(10);
+	        CheckBox enableBox = new CheckBox();
+	        Label operationLabel = new Label(entry.getKey().toString().replace("_", "."));
+	        TextField latencyField = new TextField(String.valueOf(entry.getValue()));
+	        latencyField.setVisible(false);
+	
+	        enableBox.selectedProperty().addListener((_, _, isSelected) -> {
+	            latencyField.setVisible(isSelected);
+	        });
+	
+	        row.getChildren().addAll(enableBox, operationLabel, latencyField);
+	        operationInputs.getChildren().add(row);
+	    }
+	    nextButton.setOnAction(_ -> handleNext(operationLatenciesRef.get()));
+	}
+	
     private void handleNext(Map<Operations, Integer> operationLatencies) {
         ArrayList<Object> instructions = parent.getInstructions();
         for (Object obj : instructions) {

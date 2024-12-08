@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Pipeline {
 
@@ -14,6 +15,7 @@ public class Pipeline {
     private LinkedHashMap<String, StoreBuffer> storeBuffers;
     private LinkedHashMap<String, ReservationStation> adderReservationStations;
     private LinkedHashMap<String, ReservationStation> multiplierReservationStations;
+    private HashMap<String, LoopInstruction> loopInstructions = new HashMap<>();
 
     // Helper method to streamline buffers' initialization for the constructor and add them to a LinkedHashMap, representing an entire buffer.
     private <T extends Buffer> LinkedHashMap<String, T> initializeBuffers(int count, Class<T> clazz, String prefix) {
@@ -39,6 +41,16 @@ public class Pipeline {
         }
         return stationMap;
     }
+    
+    // Method to parse LoopInstructions and add them to the HashMap
+    private void parseLoopInstructions(ArrayList<Object> instructions) {
+        for (Object instruction : instructions) {
+            if (instruction instanceof LoopInstruction) {
+                LoopInstruction loopInstruction = (LoopInstruction) instruction;
+                loopInstructions.put(loopInstruction.getName(), loopInstruction);
+            }
+        }
+    }
 
     public Pipeline(ArrayList<Object> instructions, String[] entryNames, String[] qIs, String[] values, String[] fentryNames, String[] fqIs, String[] fvalues, int loadBufferSize, int storeBufferSize, int adderReservationStationSize, int multiplierReservationStationSize) {
         this.instructions.addAll(instructions);
@@ -48,8 +60,9 @@ public class Pipeline {
         this.storeBuffers = initializeBuffers(storeBufferSize, StoreBuffer.class, "S");
         this.adderReservationStations = initializeReservationStations(adderReservationStationSize, "A");
         this.multiplierReservationStations = initializeReservationStations(multiplierReservationStationSize, "M");
+        parseLoopInstructions(instructions);
     }
-//_________________________________________Object Accessor Methods_____________________________________________ 
+//______________________________________________Object Accessor Methods_________________________________________________ 
     public Queue<Object> getInstructions() {
         return instructions;
     }
@@ -77,8 +90,23 @@ public class Pipeline {
 	public LinkedHashMap<String, ReservationStation> getMultiplierReservationStations() {
 		return multiplierReservationStations;
 	}
-//_____________________________________________________________________________________________________________
+//________________________________________Instruction Accessor Methods__________________________________________________
+	public Object dequeueInstruction() {
+		return this.instructions.poll();
+	}
 
+	public Object peekInstruction() {
+		return this.instructions.peek();
+	}
+	
+	public boolean hasInstructions() {
+		return !this.instructions.isEmpty();
+	}
+	
+    public LoopInstruction getLoopInstruction(String name) {
+        return loopInstructions.get(name);
+    }
+//______________________________________________________________________________________________________________________
 	// Load Buffer Accessor Methods
     public LoadBuffer getLoadBufferEntry(String name) {
         return this.loadBuffers.get(name);
@@ -96,7 +124,7 @@ public class Pipeline {
     public void setStoreBufferEntry(String name, StoreBuffer storeBuffer) {
         this.storeBuffers.put(name, storeBuffer);
     }
-//_____________________________________________________________________________________________________________
+//______________________________________________________________________________________________________________________
     // Adder Reservation Station Accessor Methods
     public ReservationStation getAdderReservationStationEntry(String name) {
         return this.adderReservationStations.get(name);
@@ -114,7 +142,7 @@ public class Pipeline {
     public void setMultiplierReservationStationEntry(String name, ReservationStation multiplierReservationStation) {
         this.multiplierReservationStations.put(name, multiplierReservationStation);
     }
-//__________________________Reservation Stations & Buffers' isBusy() and Search________________________________
+//______________________________Reservation Stations & Buffers' isBusy() and Search_____________________________________
   
     // Check for free Load Buffer
     public boolean isThereAFreeLoadBuffer() {
@@ -155,5 +183,5 @@ public class Pipeline {
     public String getFreeMultiplierName() {
         return multiplierReservationStations.keySet().stream().filter(name -> !multiplierReservationStations.get(name).isBusy()).findFirst().orElse(null);
     }
-//_____________________________________________________________________________________________________________
+//______________________________________________________________________________________________________________________
 }

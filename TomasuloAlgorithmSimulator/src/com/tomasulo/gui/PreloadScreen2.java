@@ -11,10 +11,11 @@ import java.util.List;
 import com.tomasulo.utils.InstructionParser;
 
 public class PreloadScreen2 extends VBox {
-	
+
     private SimulatorUI parent;
     private VBox registerInputs, floatingRegisterInputs;
     private Button nextButton;
+    private ScrollPane scrollPane;
 
     public PreloadScreen2(SimulatorUI parent) {
         this.parent = parent;
@@ -25,14 +26,17 @@ public class PreloadScreen2 extends VBox {
         nextButton = new Button("Next");
         nextButton.setOnAction(_ -> handleNext());
 
-        this.getChildren().addAll(
+        scrollPane = new ScrollPane();
+        scrollPane.setContent(new VBox(
             new Label("Destination Registers Preloading"),
             new Label("Integer Registers:"),
             registerInputs,
             new Label("Floating-Point Registers:"),
-            floatingRegisterInputs,
-            nextButton
-        );
+            floatingRegisterInputs
+        ));
+        scrollPane.setFitToWidth(true);
+
+        this.getChildren().addAll(scrollPane, nextButton);
     }
 
     public void initialize(String filePath) {
@@ -53,29 +57,34 @@ public class PreloadScreen2 extends VBox {
             showAlert("Error extracting destinations: " + e.getMessage());
         }
     }
-
-    private HBox createRegisterRow(String regName) {
-        HBox row = new HBox(10);
-        Label regLabel = new Label(regName);
-        TextField valueField = new TextField();
-        valueField.setPromptText("Value");
-
-        row.getChildren().addAll(regLabel, valueField);
-        return row;
-    }
     
+	private HBox createRegisterRow(String regName) {
+	    HBox row = new HBox(10);
+	    CheckBox enableBox = new CheckBox();
+	    Label regLabel = new Label(regName);
+	    TextField valueField = new TextField();
+	    valueField.setPromptText("Value");
+	    valueField.setVisible(false);
+	
+	    enableBox.selectedProperty().addListener((_, _, isSelected) -> {
+	        valueField.setVisible(isSelected);
+	    });
+	
+	    row.getChildren().addAll(enableBox, regLabel, valueField);
+	    return row;
+	}
+
     private void handleNext() {
         try {
-        	
-        	// Pre-load Integer Registers
+            // Pre-load Integer Registers
             String[] entryNames = new String[registerInputs.getChildren().size()];
             String[] qIs = new String[registerInputs.getChildren().size()];
             String[] values = new String[registerInputs.getChildren().size()];
 
             for (int i = 0; i < registerInputs.getChildren().size(); i++) {
                 HBox row = (HBox) registerInputs.getChildren().get(i);
-                entryNames[i] = ((Label) row.getChildren().get(0)).getText();
-                TextField valueField = (TextField) row.getChildren().get(1);
+                entryNames[i] = ((Label) row.getChildren().get(1)).getText();
+                TextField valueField = (TextField) row.getChildren().get(2);
                 values[i] = valueField.getText();
                 if (values[i].isEmpty()) {
                     values[i] = null;
@@ -84,16 +93,16 @@ public class PreloadScreen2 extends VBox {
                     qIs[i] = "0";
                 }
             }
-            
-            //Pre-load Floating-Point Registers
+
+            // Pre-load Floating-Point Registers
             String[] fentryNames = new String[floatingRegisterInputs.getChildren().size()];
             String[] fqIs = new String[floatingRegisterInputs.getChildren().size()];
             String[] fvalues = new String[floatingRegisterInputs.getChildren().size()];
 
             for (int i = 0; i < floatingRegisterInputs.getChildren().size(); i++) {
                 HBox row = (HBox) floatingRegisterInputs.getChildren().get(i);
-                fentryNames[i] = ((Label) row.getChildren().get(0)).getText();
-                TextField valueField = (TextField) row.getChildren().get(1);
+                fentryNames[i] = ((Label) row.getChildren().get(1)).getText();
+                TextField valueField = (TextField) row.getChildren().get(2);
                 fvalues[i] = valueField.getText();
                 if (fvalues[i].isEmpty()) {
                     fvalues[i] = null;
