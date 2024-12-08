@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
 public class InstructionParser {
 
@@ -64,22 +65,23 @@ public class InstructionParser {
         return instructionList;
     }
 
-    private static Instruction parseInstruction(String line) {
-        String[] parts = line.split("\\s+");
 
-        if (parts.length < 2 || parts.length > 4) {
-            throw new IllegalArgumentException("Invalid MIPS instruction format: " + line);
-        }
-
-        Operations operation = parseOperation(parts[0]);
-        String destination = parts.length > 1 ? parts[1] : null;
-        String source1 = parts.length > 2 ? parts[2] : null;
-        String source2 = parts.length > 3 ? parts[3] : null;
-
-        validateOperands(destination, source1, source2);
-
-        return new Instruction(operation, destination, source1, source2);
-    }
+	private static Instruction parseInstruction(String line) {
+	    String[] parts = line.split("\\s+");
+	
+	    if (parts.length < 2 || parts.length > 4) {
+	        throw new IllegalArgumentException("Invalid MIPS instruction format: " + line);
+	    }
+	
+	    Operations operation = parseOperation(parts[0]);
+	    String destination = parts.length > 1 ? parts[1].replace(",", "").trim() : null;
+	    String source1 = parts.length > 2 ? parts[2].replace(",", "").trim() : null;
+	    String source2 = parts.length > 3 ? parts[3].replace(",", "").trim() : null;
+	
+	    validateOperands(destination, source1, source2);
+	
+	    return new Instruction(operation, destination, source1, source2);
+	}
 
     private static Operations parseOperation(String operationStr) {
         operationStr = operationStr.toUpperCase().replace(".", "_");
@@ -90,117 +92,163 @@ public class InstructionParser {
         }
     }
 
-    private static void validateOperands(String... operands) {
-        for (String operand : operands) {
-            if (operand == null) continue;
-            if (!operand.matches("^(F\\d+|R\\d+|\\d+|Y\\(R\\d+\\))$")) {
-                throw new IllegalArgumentException("Invalid operand: " + operand);
-            }
-        }
-    }
+	private static void validateOperands(String... operands) {
+	    for (String operand : operands) {
+	        if (operand == null) continue;
+	        if (!operand.toUpperCase().matches("^(F\\d+|R\\d+|\\d+|\\d+\\(R\\d+\\)|[A-Za-z_][A-Za-z0-9_]*)$")) {
+	            throw new IllegalArgumentException("Invalid operand: " + operand);
+	        }
+	    }
+	}
+
     
-    public static String[] extractDestinations(String filePath) throws IOException {
-        TreeSet<String> fRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
-        TreeSet<String> rRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
+	public static String[] extractDestinations(String filePath) throws IOException {
+	    TreeSet<String> fRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
+	    TreeSet<String> rRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
 
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
-        String line;
+	    BufferedReader reader = new BufferedReader(new FileReader(filePath));
+	    String line;
 
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
+	    while ((line = reader.readLine()) != null) {
+	        line = line.trim();
 
-            if (line.isEmpty() || line.toLowerCase().startsWith("loop")) {
-                continue;
-            }
+	        if (line.isEmpty() || line.toLowerCase().startsWith("loop")) {
+	            continue;
+	        }
 
-            String[] parts = line.split("\\s+");
-            if (parts.length < 2) {
-                continue;
-            }
+	        String[] parts = line.split("\\s+");
+	        if (parts.length < 2) {
+	            continue;
+	        }
 
-            String destination = parts[1];
-            if (destination.matches("^F\\d+$")) {
-                fRegisters.add(destination.toUpperCase());
-            } else if (destination.matches("^R\\d+$")) {
-                rRegisters.add(destination.toUpperCase());
-            }
-        }
+	        String destination = parts[1].replace(",", "").toUpperCase();
 
-        reader.close();
+	        if (destination.matches("^F\\d+$")) {
+	            fRegisters.add(destination);
+	        } else if (destination.matches("^R\\d+$")) {
+	            rRegisters.add(destination);
+	        }
+	    }
 
-        ArrayList<String> combined = new ArrayList<>(fRegisters);
-        combined.addAll(rRegisters);
+	    reader.close();
 
-        return combined.toArray(new String[0]);
-    }
-    
-    public static String[] extractNonDestinations(String filePath, String[] destinations) throws IOException {
-        TreeSet<String> fRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
-        TreeSet<String> rRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
-        TreeSet<String> yRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(2, reg.length() - 1))));
+	    ArrayList<String> combined = new ArrayList<>();
+	    combined.addAll(rRegisters);
+	    combined.addAll(fRegisters);
 
-        Set<String> destinationSet = new HashSet<>(Arrays.asList(destinations));
+	    return combined.toArray(new String[0]);
+	}
 
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
-        String line;
+	public static String[] extractNonDestinations(String filePath, String[] destinations) throws IOException {
+	    Set<String> destinationSet = new HashSet<>(Arrays.asList(destinations));
 
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
+	    TreeSet<String> fRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
+	    TreeSet<String> rRegisters = new TreeSet<>(Comparator.comparingInt(reg -> Integer.parseInt(reg.substring(1))));
 
-            if (line.isEmpty() || line.toLowerCase().startsWith("loop")) {
-                continue;
-            }
+	    BufferedReader reader = new BufferedReader(new FileReader(filePath));
+	    String line;
 
-            String[] parts = line.split("\\s+");
-            if (parts.length < 3) {
-                continue;
-            }
+	    while ((line = reader.readLine()) != null) {
+	        line = line.trim();
 
-            String source1 = parts[2];
-            String source2 = parts.length > 3 ? parts[3] : null;
+	        if (line.isEmpty() || line.toLowerCase().startsWith("loop")) {
+	            continue;
+	        }
 
-            if (source1 != null && !destinationSet.contains(source1.toUpperCase())) {
-                if (source1.matches("^F\\d+$")) {
-                    fRegisters.add(source1.toUpperCase());
-                } else if (source1.matches("^R\\d+$")) {
-                    rRegisters.add(source1.toUpperCase());
-                } else if (source1.matches("^Y\\(R\\d+\\)$")) {
-                    yRegisters.add(source1.toUpperCase());
-                }
-            }
+	        String[] parts = line.split("\\s+");
+	        if (parts.length < 3) {
+	            continue;
+	        }
 
-            if (source2 != null && !destinationSet.contains(source2.toUpperCase())) {
-                if (source2.matches("^F\\d+$")) {
-                    fRegisters.add(source2.toUpperCase());
-                } else if (source2.matches("^R\\d+$")) {
-                    rRegisters.add(source2.toUpperCase());
-                } else if (source2.matches("^Y\\(R\\d+\\)$")) {
-                    yRegisters.add(source2.toUpperCase());
-                }
-            }
-        }
+	        String source1 = parts[2].replace(",", "").toUpperCase();
+	        String source2 = parts.length > 3 ? parts[3].replace(",", "").toUpperCase() : null;
 
-        reader.close();
+	        Consumer<String> processSource = (src) -> {
+	            if (src == null) return;
+	            
+	            if (src.matches("^R\\d+$") || src.matches("^F\\d+$")) {
+	                if (!destinationSet.contains(src)) {
+	                    if (src.startsWith("R")) {
+	                        rRegisters.add(src);
+	                    } else {
+	                        fRegisters.add(src);
+	                    }
+	                }
+	            } else if (src.matches("^\\d+\\(R\\d+\\)$")) {
+	                String regInside = src.substring(src.indexOf('(') + 1, src.indexOf(')'));
+	                regInside = regInside.toUpperCase();
+	                if (!destinationSet.contains(regInside)) {
+	                    rRegisters.add(regInside);
+	                }
+	            } 
+	        };
 
-        ArrayList<String> combined = new ArrayList<>(fRegisters);
-        combined.addAll(rRegisters);
-        combined.addAll(yRegisters);
+	        processSource.accept(source1);
+	        processSource.accept(source2);
+	    }
 
-        return combined.toArray(new String[0]);
-    }
+	    reader.close();
+
+	    fRegisters.removeAll(destinationSet);
+	    rRegisters.removeAll(destinationSet);
+
+	    ArrayList<String> combined = new ArrayList<>();
+	    combined.addAll(rRegisters);
+	    combined.addAll(fRegisters);
+
+	    return combined.toArray(new String[0]);
+	}
     
     public static Map<Operations, Integer> extractOperations(String filePath) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(filePath));
+
         Map<Operations, Integer> operations = new HashMap<>();
-        for (Operations op : Operations.values()) {
-            operations.put(op, 1);
-        }
+
         for (String line : lines) {
-            String[] parts = line.split(" ");
-            Operations operation = Operations.valueOf(parts[0].replace(".", "_").toUpperCase());
-            int latency = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
-            operations.put(operation, latency);
+            if (line.trim().isEmpty()) {
+                continue;
+            }
+
+            String[] parts = line.trim().split("\\s+");
+            if (parts.length < 1) {
+                continue;
+            }
+
+            try {
+                String operationName = parts[0].replace(".", "_").toUpperCase();
+                Operations operation = Operations.valueOf(operationName);
+
+                operations.put(operation, 1);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Skipping invalid line: " + line);
+            }
         }
+
         return operations;
+    }
+    
+    public static void main(String[] args) {
+        String testFilePath = "C:\\Users\\Youse\\Desktop\\File.txt";
+
+        try {
+            // Test parseInstructions method
+            ArrayList<Object> instructions = InstructionParser.parseInstructions(testFilePath);
+            System.out.println("Parsed Instructions: " + instructions);
+
+            // Test extractDestinations method
+            String[] destinations = InstructionParser.extractDestinations(testFilePath);
+            System.out.println("Extracted Destinations: " + String.join(", ", destinations));
+
+            // Test extractNonDestinations method
+            String[] nonDestinations = InstructionParser.extractNonDestinations(testFilePath, destinations);
+            System.out.println("Extracted Non-Destinations: " + String.join(", ", nonDestinations));
+
+            // Test extractOperations method
+            Map<Operations, Integer> operations = InstructionParser.extractOperations(testFilePath);
+            System.out.println("Extracted Operations: " + operations);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

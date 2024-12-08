@@ -23,7 +23,7 @@ public class PreloadScreen2 extends VBox {
         registerInputs = new VBox();
         floatingRegisterInputs = new VBox();
         nextButton = new Button("Next");
-        nextButton.setOnAction(e -> handleNext());
+        nextButton.setOnAction(_ -> handleNext());
 
         this.getChildren().addAll(
             new Label("Destination Registers Preloading"),

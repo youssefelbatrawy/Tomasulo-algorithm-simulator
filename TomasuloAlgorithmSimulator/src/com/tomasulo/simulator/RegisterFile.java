@@ -1,17 +1,37 @@
-
 package com.tomasulo.simulator;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class RegisterFile {
 
     private TreeMap<String, String[]> registerFile;
+    
+    
+    // Helper method to help the tree map sort the registers in a natural order
+    private int compareRegisters(String reg1, String reg2) {
+        int num1 = extractNumericPart(reg1);
+        int num2 = extractNumericPart(reg2);
+
+        if (num1 != num2) {
+            return Integer.compare(num1, num2);
+        }
+
+        return reg1.compareTo(reg2);
+    }
+
+    private int extractNumericPart(String register) {
+        String numericPart = register.replaceAll("\\D+", "");
+        return numericPart.isEmpty() ? 0 : Integer.parseInt(numericPart);
+    }
 
     public RegisterFile(String[] entryName, String[] qIs, String[] values) {
-        this.registerFile = new TreeMap<>();
-        IntStream.range(0, entryName.length).forEach(i -> {String qIValue = (qIs != null && i < qIs.length) ? qIs[i] : null; String regValue = (values != null && i < values.length) ? values[i] : null; registerFile.put(entryName[i].toUpperCase(), new String[]{qIValue, regValue});});
+        this.registerFile = new TreeMap<>(this::compareRegisters);
+        IntStream.range(0, entryName.length).forEach(i -> {
+            String qIValue = (qIs != null && i < qIs.length) ? qIs[i] : null;
+            String regValue = (values != null && i < values.length) ? values[i] : null;
+            registerFile.put(entryName[i].toUpperCase(), new String[]{qIValue, regValue});
+        });
     }
 
     public Map<String, String[]> getRegisterFile() {
@@ -34,7 +54,7 @@ public class RegisterFile {
         String[] existingEntry = registerFile.get(targetUpper);
         registerFile.put(targetUpper, new String[]{qI, existingEntry[1]});
     }
-    
+
     public void setValue(String target, String value) {
         String targetUpper = target.toUpperCase();
         if (!registerFile.containsKey(targetUpper)) {
@@ -51,7 +71,7 @@ public class RegisterFile {
         }
         return registerFile.get(targetUpper)[1];
     }
-    
+
     public String[] getRegisterFileEntry(String target) {
         String targetUpper = target.toUpperCase();
         if (!registerFile.containsKey(targetUpper)) {
@@ -81,19 +101,23 @@ public class RegisterFile {
         }
         registerFile.put(targetUpper, new String[]{qI, value});
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        registerFile.forEach((key, value) -> {sb.append(key).append("=["); sb.append(String.join(", ", value)); sb.append("], ");});
-        
+        registerFile.forEach((key, value) -> {
+            sb.append(key).append("=[");
+            sb.append(String.join(", ", value));
+            sb.append("], ");
+        });
+
         if (sb.length() > 1) {
             sb.setLength(sb.length() - 2);
         }
-        
+
         sb.append("}");
-        
+
         return sb.toString();
     }
 }

@@ -7,11 +7,10 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.Map;
 
-import com.tomasulo.predefintions.Operations;
 import com.tomasulo.simulator.Pipeline;
 //import com.tomasulo.simulator.SimulationLogic;
+import com.tomasulo.simulator.SimulationLogic;
 
 public class SimulatorUI extends Application {
 
@@ -28,7 +27,6 @@ public class SimulatorUI extends Application {
     private String[] entryNames, qIs, values, fentryNames, fqIs, fvalues;
     private String[] additionalEntryNames, additionalQIs, additionalValues, additionalFEntryNames, additionalFQIs, additionalFValues;
     private int loadBuffer, storeBuffer, adderStations, multiplierStations;
-    private Map<Operations, Integer> operationLatencies;
 
     @Override
     public void start(Stage primaryStage) {
@@ -61,14 +59,14 @@ public class SimulatorUI extends Application {
 	public ArrayList<Object> getInstructions() {
 		return instructions;
 	}
+	
+    public void setInstructions(ArrayList<Object> instructions) {
+        this.instructions = instructions;
+    }
 
 	public void showScreen(Pane screen) {
         root.getChildren().forEach(child -> child.setVisible(false));
         screen.setVisible(true);
-    }
-
-    public void setInstructions(ArrayList<Object> instructions) {
-        this.instructions = instructions;
     }
 
     public void setPreloadData(String[] entryNames, String[] qIs, String[] values, String[] fentryNames, String[] fqIs, String[] fvalues) {
@@ -95,10 +93,19 @@ public class SimulatorUI extends Application {
         this.adderStations = adderStations;
         this.multiplierStations = multiplierStations;
     }
-
-    public void setOperationLatencies(Map<Operations, Integer> operationLatencies) {
-        this.operationLatencies = operationLatencies;
-    }
+    
+	public void addAdditionalPreloadData(Pipeline pipeline) {
+        for (int i = 0; i < additionalEntryNames.length; i++) {
+        	if (additionalValues[i] != null) {
+                pipeline.getRegisterFile().addRegFileEntry(additionalEntryNames[i], additionalQIs[i], additionalValues[i]);
+        	}
+        }
+        for (int i = 0; i < additionalFEntryNames.length; i++) {
+        	if (additionalFValues[i] != null) {
+        		pipeline.getFloatingPointRegisterFile().addRegFileEntry(additionalFEntryNames[i], additionalFQIs[i], additionalFValues[i]);
+        	}
+        }
+	}
 
     public void launchSimulation() {
         Pipeline pipeline = new Pipeline(
@@ -106,15 +113,11 @@ public class SimulatorUI extends Application {
             fentryNames, fqIs, fvalues,
             loadBuffer, storeBuffer, adderStations, multiplierStations
         );
-
-        for (int i = 0; i < additionalEntryNames.length; i++) {
-            pipeline.getRegisterFile().addRegFileEntry(additionalEntryNames[i], additionalQIs[i], additionalValues[i]);
-        }
-        for (int i = 0; i < additionalFEntryNames.length; i++) {
-            pipeline.getFloatingPointRegisterFile().addRegFileEntry(additionalFEntryNames[i], additionalFQIs[i], additionalFValues[i]);
-        }
-
-//        SimulationLogic.start(pipeline);
+        
+        addAdditionalPreloadData(pipeline);
+        
+        SimulationLogic.start(pipeline);
+        
         showScreen(finalScreen);
     }
 

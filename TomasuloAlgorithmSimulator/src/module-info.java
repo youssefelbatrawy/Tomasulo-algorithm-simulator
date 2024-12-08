@@ -9,6 +9,7 @@ module TomasuloAlgorithmSimulator {
 	requires transitive javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
+	requires org.junit.jupiter.api;
     opens com.tomasulo.gui to javafx.fxml;
 
     // Ma7desh leeeh da3wa bel lines deh wala ye7ot wala yezawed

@@ -11,7 +11,6 @@ import com.tomasulo.utils.InstructionParser;
 
 public class PreloadScreen3 extends VBox {
 
-    private String filePath;
     private SimulatorUI parent;
     private VBox registerInputs, floatingRegisterInputs;
     private Button nextButton;
@@ -23,7 +22,7 @@ public class PreloadScreen3 extends VBox {
         registerInputs = new VBox();
         floatingRegisterInputs = new VBox();
         nextButton = new Button("Next");
-        nextButton.setOnAction(e -> handleNext());
+        nextButton.setOnAction(_ -> handleNext());
 
         this.getChildren().addAll(
             new Label("Non-Destination Registers Preloading"),
@@ -36,7 +35,6 @@ public class PreloadScreen3 extends VBox {
     }
 
     public void initialize(String filePath, List<String> destinationRegisters) {
-        this.filePath = filePath;
         registerInputs.getChildren().clear();
         floatingRegisterInputs.getChildren().clear();
 

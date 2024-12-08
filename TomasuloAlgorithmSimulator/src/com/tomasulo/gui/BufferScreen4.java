@@ -22,7 +22,7 @@ public class BufferScreen4 extends VBox {
         multiplierStationsField.setPromptText("Multiplier Reservation Stations");
 
         nextButton = new Button("Next");
-        nextButton.setOnAction(e -> handleNext());
+        nextButton.setOnAction(_ -> handleNext());
 
         this.getChildren().addAll(new Label("Buffer and Reservation Station Sizes"), loadBufferField, storeBufferField, adderStationsField, multiplierStationsField, nextButton);
     }

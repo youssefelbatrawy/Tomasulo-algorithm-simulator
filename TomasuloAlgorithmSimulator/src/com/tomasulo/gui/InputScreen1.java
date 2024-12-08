@@ -22,11 +22,11 @@ public class InputScreen1 extends VBox {
 		filePathField.setPromptText("Enter or select instruction file path...");
 
 		loadButton = new Button("Load File");
-		loadButton.setOnAction(e -> handleFileLoad());
+		loadButton.setOnAction(_ -> handleFileLoad());
 
 		nextButton = new Button("Next");
-		nextButton.setOnAction(e -> handleNext());
-		nextButton.setDisable(true); // Initially disabled
+		nextButton.setOnAction(_ -> handleNext());
+		nextButton.setDisable(true);
 
 		this.getChildren().addAll(new Label("Instruction Input"), filePathField, loadButton, nextButton);
 	}
