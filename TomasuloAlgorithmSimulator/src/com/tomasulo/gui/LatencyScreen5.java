@@ -78,6 +78,6 @@ public class LatencyScreen5 extends VBox {
             }
         }
         parent.setInstructions(instructions);
-        parent.launchSimulation();
+        parent.showScreen(parent.memoryCacheInputPanel);
     }
 }

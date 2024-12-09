@@ -237,50 +237,10 @@ public class InstructionParser {
 
                 operations.put(operation, 1);
             } catch (IllegalArgumentException e) {
-                System.err.println("Skipping invalid line: " + line);
+            	// Do nothing
             }
         }
 
         return operations;
-    }
-    
-    public static void main(String[] args) {
-        String filePath = "C:\\Users\\Youse\\Desktop\\File.txt"; // Update this path to your instruction file
-
-        try {
-            // Parse instructions
-            ArrayList<Object> instructions = InstructionParser.parseInstructions(filePath);
-
-            // Print parsed instructions
-            for (Object instruction : instructions) {
-                if (instruction instanceof Instruction) {
-                    System.out.println((Instruction) instruction);
-                } else if (instruction instanceof LoopInstruction) {
-                    System.out.println((LoopInstruction) instruction);
-                }
-            }
-
-            // Extract destinations
-            String[] destinations = InstructionParser.extractDestinations(filePath);
-            System.out.println("Destinations:");
-            for (String dest : destinations) {
-                System.out.println(dest);
-            }
-
-            // Extract non-destinations
-            String[] nonDestinations = InstructionParser.extractNonDestinations(filePath, destinations);
-            System.out.println("Non-Destinations:");
-            for (String nonDest : nonDestinations) {
-                System.out.println(nonDest);
-            }
-
-            // Extract operations
-            var operations = InstructionParser.extractOperations(filePath);
-            System.out.println("Operations:");
-            operations.forEach((op, count) -> System.out.println(op + ": " + count));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    }   
 }

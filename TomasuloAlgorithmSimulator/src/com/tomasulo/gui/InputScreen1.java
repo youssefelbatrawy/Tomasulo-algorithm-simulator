@@ -21,7 +21,7 @@ public class InputScreen1 extends VBox {
 
         filePathField = new TextField();
         filePathField.setPromptText("Enter or select instruction file path...");
-        filePathField.textProperty().addListener((obs, oldText, newText) -> {
+        filePathField.textProperty().addListener((_, _, newText) -> {
             nextButton.setDisable(newText.trim().isEmpty());
         });
 

@@ -1,10 +1,13 @@
 package com.tomasulo.simulator;
 
+import com.tomasulo.memory.Cache;
+import com.tomasulo.memory.Memory;
+
 //import com.tomasulo.utils.Issuer;
 
 public class SimulationLogic {
 
-    public static void start(Pipeline pipeline) {
+    public static void start(Pipeline pipeline, Memory memory, Cache cache) {
         // Print instructions
         System.out.println("Instructions:");
         pipeline.getInstructions().forEach(System.out::println);

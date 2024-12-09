@@ -2,6 +2,9 @@ package com.tomasulo.simulator;
 
 import java.util.LinkedHashMap;
 import java.util.Queue;
+
+import com.tomasulo.utils.FixedSizeLinkedHashMap;
+
 import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,15 +14,14 @@ public class Pipeline {
     private Queue<Object> instructions = new LinkedList<>();
     private RegisterFile floatingPointRegisterFile;
     private RegisterFile registerFile;
-    private LinkedHashMap<String, LoadBuffer> loadBuffers;
-    private LinkedHashMap<String, StoreBuffer> storeBuffers;
-    private LinkedHashMap<String, ReservationStation> adderReservationStations;
-    private LinkedHashMap<String, ReservationStation> multiplierReservationStations;
+    private FixedSizeLinkedHashMap<String, LoadBuffer> loadBuffers;
+    private FixedSizeLinkedHashMap<String, StoreBuffer> storeBuffers;
+    private FixedSizeLinkedHashMap<String, ReservationStation> adderReservationStations;
+    private FixedSizeLinkedHashMap<String, ReservationStation> multiplierReservationStations;
     private HashMap<String, LoopInstruction> loopInstructions = new HashMap<>();
 
-    // Helper method to streamline buffers' initialization for the constructor and add them to a LinkedHashMap, representing an entire buffer.
-    private <T extends Buffer> LinkedHashMap<String, T> initializeBuffers(int count, Class<T> clazz, String prefix) {
-        LinkedHashMap<String, T> bufferMap = new LinkedHashMap<>();
+    private <T extends Buffer> FixedSizeLinkedHashMap<String, T> initializeBuffers(int count, Class<T> clazz, String prefix) {
+        FixedSizeLinkedHashMap<String, T> bufferMap = new FixedSizeLinkedHashMap<>(count);
         for (int i = 1; i <= count; i++) {
             try {
                 String name = prefix + i;
@@ -32,17 +34,15 @@ public class Pipeline {
         return bufferMap;
     }
 
-    // Helper method to streamline reservation stations' initialization for the constructor and add them to a LinkedHashMap, representing an entire reservation station.
-    private LinkedHashMap<String, ReservationStation> initializeReservationStations(int count, String prefix) {
-        LinkedHashMap<String, ReservationStation> stationMap = new LinkedHashMap<>();
+    private FixedSizeLinkedHashMap<String, ReservationStation> initializeReservationStations(int count, String prefix) {
+        FixedSizeLinkedHashMap<String, ReservationStation> stationMap = new FixedSizeLinkedHashMap<>(count);
         for (int i = 1; i <= count; i++) {
             String name = prefix + i;
             stationMap.put(name, new ReservationStation(name));
         }
         return stationMap;
     }
-    
-    // Method to parse LoopInstructions and add them to the HashMap
+
     private void parseLoopInstructions(ArrayList<Object> instructions) {
         for (Object instruction : instructions) {
             if (instruction instanceof LoopInstruction) {

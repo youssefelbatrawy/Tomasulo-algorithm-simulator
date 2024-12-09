@@ -8,6 +8,9 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
+import com.tomasulo.memory.Cache;
+//import com.tomasulo.memory.Memory;
+import com.tomasulo.predefintions.MemorySize;
 import com.tomasulo.simulator.Pipeline;
 //import com.tomasulo.simulator.SimulationLogic;
 import com.tomasulo.simulator.SimulationLogic;
@@ -20,6 +23,7 @@ public class SimulatorUI extends Application {
     protected PreloadScreen3 preloadScreen3;
     protected BufferScreen4 bufferScreen4;
     protected LatencyScreen5 latencyScreen5;
+    protected MemoryCacheInputPanel memoryCacheInputPanel;
     protected OutputPanel finalScreen;
 
     private String filePath;
@@ -27,6 +31,8 @@ public class SimulatorUI extends Application {
     private String[] entryNames, qIs, values, fentryNames, fqIs, fvalues;
     private String[] additionalEntryNames, additionalQIs, additionalValues, additionalFEntryNames, additionalFQIs, additionalFValues;
     private int loadBuffer, storeBuffer, adderStations, multiplierStations;
+    private int memorySize, cacheSize, blockSize;
+    private MemorySize wordSize;
 
     @Override
     public void start(Stage primaryStage) {
@@ -37,9 +43,10 @@ public class SimulatorUI extends Application {
         preloadScreen3 = new PreloadScreen3(this);
         bufferScreen4 = new BufferScreen4(this);
         latencyScreen5 = new LatencyScreen5(this);
+        memoryCacheInputPanel = new MemoryCacheInputPanel(this);
         finalScreen = new OutputPanel();
 
-        root.getChildren().addAll(inputScreen1, preloadScreen2, preloadScreen3, bufferScreen4, latencyScreen5, finalScreen);
+        root.getChildren().addAll(inputScreen1, preloadScreen2, preloadScreen3, bufferScreen4, latencyScreen5, memoryCacheInputPanel, finalScreen);
         showScreen(inputScreen1);
 
         Scene scene = new Scene(root, 1000, 700);
@@ -106,17 +113,24 @@ public class SimulatorUI extends Application {
         	}
         }
 	}
+	
+	public void setMemoryCacheData(int memorySize, MemorySize wordSize, int cacheSize, int blockSize) {
+		this.memorySize = memorySize;
+		this.wordSize = wordSize;
+		this.cacheSize = cacheSize;
+		this.blockSize = blockSize;
+	}
 
     public void launchSimulation() {
-        Pipeline pipeline = new Pipeline(
-            instructions, entryNames, qIs, values,
-            fentryNames, fqIs, fvalues,
-            loadBuffer, storeBuffer, adderStations, multiplierStations
-        );
-        
+    	
+        Pipeline pipeline = new Pipeline(instructions, entryNames, qIs, values, fentryNames, fqIs, fvalues, loadBuffer, storeBuffer, adderStations, multiplierStations);
         addAdditionalPreloadData(pipeline);
         
-        SimulationLogic.start(pipeline);
+//        Memory memory = new Memory(memorySize, wordSize);
+//
+//        Cache cache = new Cache(memory, cacheSize, blockSize);
+//        
+//        SimulationLogic.start(pipeline, memory, cache);
         
         showScreen(finalScreen);
     }
