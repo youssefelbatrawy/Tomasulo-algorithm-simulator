@@ -27,10 +27,6 @@ public class ReservationStation {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public boolean isBusy() {
 		return isBusy;
 	}
