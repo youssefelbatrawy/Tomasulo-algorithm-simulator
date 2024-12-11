@@ -1,8 +1,8 @@
 package com.tomasulo.simulator;
 
-import java.util.LinkedHashMap;
 import java.util.Queue;
 
+import com.tomasulo.predefintions.Operations;
 import com.tomasulo.utils.FixedSizeLinkedHashMap;
 
 import java.util.LinkedList;
@@ -145,7 +145,7 @@ public class Pipeline {
         return this.adderReservationStations.get(name);
     }
 
-    public void setAdderReservationStationEntry(String name, boolean isBusy, String op, String v_j, String v_k, String q_j, String q_k) {
+    public void setAdderReservationStationEntry(String name, boolean isBusy, Operations op, String v_j, String v_k, String q_j, String q_k) {
         ReservationStation station = this.adderReservationStations.get(name);
         if (station != null) {
             station.setReservationStation(isBusy, op, v_j, v_k, q_j, q_k);
@@ -159,7 +159,7 @@ public class Pipeline {
         return this.multiplierReservationStations.get(name);
     }
 
-    public void setMultiplierReservationStationEntry(String name, boolean isBusy, String op, String v_j, String v_k, String q_j, String q_k) {
+    public void setMultiplierReservationStationEntry(String name, boolean isBusy, Operations op, String v_j, String v_k, String q_j, String q_k) {
         ReservationStation station = this.multiplierReservationStations.get(name);
         if (station != null) {
             station.setReservationStation(isBusy, op, v_j, v_k, q_j, q_k);
@@ -256,7 +256,7 @@ public class Pipeline {
         }
     }
 
-    public String getOp(String name) {
+    public Operations getOp(String name) {
         if (name.startsWith("A")) {
             return validateAndRetrieve(adderReservationStations, name, "Adder Reservation Station").getOp();
         } else if (name.startsWith("M")) {
@@ -266,7 +266,7 @@ public class Pipeline {
         }
     }
 
-    public void setOp(String name, String op) {
+    public void setOp(String name, Operations op) {
         if (name.startsWith("A")) {
             validateAndRetrieve(adderReservationStations, name, "Adder Reservation Station").setOp(op);
         } else if (name.startsWith("M")) {

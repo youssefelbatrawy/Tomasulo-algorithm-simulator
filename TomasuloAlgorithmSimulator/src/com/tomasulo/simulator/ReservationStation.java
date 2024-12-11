@@ -1,9 +1,11 @@
 package com.tomasulo.simulator;
 
+import com.tomasulo.predefintions.Operations;
+
 public class ReservationStation {
 	private String name;
 	private boolean isBusy;
-	private String op;
+	private Operations op;
 	private String v_j;
 	private String v_k;
 	private String q_j;
@@ -14,7 +16,7 @@ public class ReservationStation {
 		this.isBusy = false;
 	}
 	
-	public void setReservationStation(boolean isBusy, String op, String v_j, String v_k, String q_j, String q_k) {
+	public void setReservationStation(boolean isBusy, Operations op, String v_j, String v_k, String q_j, String q_k) {
 		this.isBusy = isBusy;
 		this.op = op;
 		this.v_j = v_j;
@@ -35,11 +37,11 @@ public class ReservationStation {
 		this.isBusy = isBusy;
 	}
 
-	public String getOp() {
+	public Operations getOp() {
 		return op;
 	}
 
-	public void setOp(String op) {
+	public void setOp(Operations op) {
 		this.op = op;
 	}
 

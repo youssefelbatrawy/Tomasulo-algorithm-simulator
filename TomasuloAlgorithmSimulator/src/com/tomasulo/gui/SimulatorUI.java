@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 
 import com.tomasulo.memory.Cache;
+import com.tomasulo.memory.Memory;
 //import com.tomasulo.memory.Memory;
 import com.tomasulo.predefintions.MemorySize;
 import com.tomasulo.simulator.Pipeline;
@@ -122,16 +123,15 @@ public class SimulatorUI extends Application {
 	}
 
     public void launchSimulation() {
-    	
-        Pipeline pipeline = new Pipeline(instructions, entryNames, qIs, values, fentryNames, fqIs, fvalues, loadBuffer, storeBuffer, adderStations, multiplierStations);
+    Pipeline pipeline = new Pipeline(instructions, entryNames, qIs, values, fentryNames, fqIs, fvalues, loadBuffer, storeBuffer, adderStations, multiplierStations);
         addAdditionalPreloadData(pipeline);
         
-//        Memory memory = new Memory(memorySize, wordSize);
-//
-//        Cache cache = new Cache(memory, cacheSize, blockSize);
-//        
-//        SimulationLogic.start(pipeline, memory, cache);
-        
+      Memory memory = new Memory(memorySize, wordSize);
+
+      Cache cache = new Cache(cacheSize, blockSize);
+      
+      SimulationLogic.start(pipeline, memory, cache);
+      
         showScreen(finalScreen);
     }
 

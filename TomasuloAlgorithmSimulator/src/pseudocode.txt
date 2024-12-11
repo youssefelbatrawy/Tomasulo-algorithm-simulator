@@ -1,0 +1,41 @@
+# Tomasulo Algorithm Pseudocode
+
+# Issue Stage:
+for each instruction in instruction_queue:
+    if reservation_station_available(instruction):
+        issue_to_reservation_station(instruction)
+        if operands_available_in_register_file(instruction):
+            load_operands_to_reservation_station(instruction)
+        else:
+            track_producer_of_operands(instruction)
+    else:
+        stall_instruction()  # Structural hazard
+
+# Execute Stage:
+for each reservation_station:
+    if operands_not_available(reservation_station):
+        monitor_CDB_for_operands(reservation_station)
+    if all_operands_available(reservation_station):
+        execute_instruction(reservation_station)
+
+# Special case: Loads and Stores
+if instruction_is_load_or_store(reservation_station):
+    if phase_one_needed(reservation_station):
+        compute_effective_address(reservation_station)
+        store_effective_address_in_buffer(reservation_station)
+    if load_buffer_ready(reservation_station):
+        execute_load_from_memory(reservation_station)
+    elif store_buffer_ready(reservation_station):
+        wait_for_store_value(reservation_station)
+        execute_store_to_memory(reservation_station)
+
+# Write Result Stage:
+for each functional_unit_result_ready:
+    write_result_to_CDB(functional_unit_result)
+    update_registers_and_reservation_stations(functional_unit_result)
+
+    if result_is_store:
+        if store_buffer_ready_to_commit(store_buffer):
+            write_store_to_memory(store_buffer)
+
+if cache is used, it is used to simulate the first cache miss so it goes and fetches the data from memory

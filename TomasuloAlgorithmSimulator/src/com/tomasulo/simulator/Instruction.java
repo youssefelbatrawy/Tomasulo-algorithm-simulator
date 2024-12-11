@@ -6,7 +6,7 @@ import com.tomasulo.predefintions.Status;
 public class Instruction {
 	private Operations operation;
 	private String source1;
-	private String source2;
+	private String source2; // if any
 	private String destination;
 	private Status status;
 	private int latency;
