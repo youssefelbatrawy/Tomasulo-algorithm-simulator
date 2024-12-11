@@ -197,9 +197,6 @@ public class SimulationLogic {
                         }
 						
 						break;
-					case B:
-						// Branching operations
-						break;
 					default:
 						throw new IllegalArgumentException("Unknown operation destination: " + InstructionCategorizer.whereDoesIssuingBelong(instruction.getOperation()));
 				}

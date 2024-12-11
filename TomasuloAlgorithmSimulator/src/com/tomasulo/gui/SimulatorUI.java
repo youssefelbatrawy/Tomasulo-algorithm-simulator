@@ -123,7 +123,8 @@ public class SimulatorUI extends Application {
 	}
 
     public void launchSimulation() {
-    Pipeline pipeline = new Pipeline(instructions, entryNames, qIs, values, fentryNames, fqIs, fvalues, loadBuffer, storeBuffer, adderStations, multiplierStations);
+    
+    	Pipeline pipeline = new Pipeline(instructions, entryNames, qIs, values, fentryNames, fqIs, fvalues, loadBuffer, storeBuffer, adderStations, multiplierStations);
         addAdditionalPreloadData(pipeline);
         
       Memory memory = new Memory(memorySize, wordSize);
